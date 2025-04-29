@@ -1,0 +1,22 @@
+To create the interface_overview.png image:
+
+1. Take a screenshot of the Enhanced Theme Studio application while it's running
+2. Use an image editor to add labels to the following areas:
+   - Label the left panel as "Theme Settings"
+   - Label the right table area as "Color Palette"
+   - Label the bottom section as "Preview Tabs"
+   - Label the buttons as "Action Buttons"
+
+3. Add arrows pointing to the specific elements mentioned in the manual:
+   - Base color selection
+   - Color scheme dropdown
+   - Number of colors dropdown
+   - WCAG compliance toggles
+   - Theme mode toggle
+   - Color swatches
+   - Preview sections
+
+4. Export as PNG with the name "interface_overview.png"
+5. Place in the same directory as the manual
+
+Note: This file is just instructions for creating the image and should be deleted after the image is created. 

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "enhanced-theme-studio"
+dynamic = ["version"]
+authors = [
+    {name = "Soundchazer2k", email = "soundchazer@gmail.com"},
+]
+description = "A powerful color palette and theme generator built with PyQt6"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "GNU General Public License v3"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Designers",
+    "Topic :: Artistic Software",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "PyQt6",
+    "numpy",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Soundchazer2k/enhanced-theme-studio"
+"Bug Tracker" = "https://github.com/Soundchazer2k/enhanced-theme-studio/issues"
+
+[project.scripts]
+theme-studio = "enhanced_theme_generator:main"
+
+[tool.setuptools]
+py-modules = ["enhanced_theme_generator"]
+
+[tool.setuptools.dynamic]
+version = {attr = "enhanced_theme_generator.__version__"} 
