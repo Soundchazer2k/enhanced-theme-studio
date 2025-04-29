@@ -98,8 +98,23 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Acknowledgments
 
-- [PyQt6](https://www.riverbankcomputing.com/software/pyqt/) for the UI framework
-- Color theory principles from various design resources
+- **Core Libraries**
+  - [PyQt6](https://www.riverbankcomputing.com/software/pyqt/) for the UI framework
+  - [NumPy](https://numpy.org/) for color calculations and transformations
+  - [Pillow](https://python-pillow.org/) for image processing in the icon creator
+
+- **Standards and Resources**
+  - [WCAG Guidelines](https://www.w3.org/WAI/standards-guidelines/wcag/) for accessibility standards
+  - [Colorblindness simulation algorithms](https://www.color-blindness.com/) for accurate color vision deficiency previews
+  - Color theory principles from various design resources
+
+- **Tools**
+  - [PyInstaller](https://www.pyinstaller.org/) for creating standalone executables
+  - [GitHub](https://github.com/) for hosting and version control
+
+- **Development Approach**
+  - AI-assisted development with LLM code generation
+  - "Vibe coding" methodology which prioritizes user experience and accessibility
 
 # Copyright (C) 2025 Soundchazer2k 
 
