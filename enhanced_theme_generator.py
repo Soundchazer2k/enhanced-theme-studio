@@ -1,5 +1,5 @@
 # Enhanced Theme Studio - A color palette generator
-# Copyright (C) 2025 Soundchazer2k
+# Copyright (C) 2024 Soundchazer2k
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,19 +28,39 @@ from datetime import datetime
 # Version information
 __version__ = "1.0.0"
 __version_info__ = (1, 0, 0)  # For programmatic access
-__release_date__ = "2025-04-28"
+__release_date__ = "2024-04-28"
 
 # --- Utilities for color math & contrast ---
 def hex_to_rgb(h):
+    h_orig = h
     try:
         h = h.lstrip('#')
+        if len(h) == 3: # Handle shorthand hex like #RGB
+            h = "".join([c*2 for c in h])
+        if len(h) != 6:
+            raise ValueError(f"Invalid hex color string: '{h_orig}' must be 3 or 6 hex characters long after '#' removal.")
         return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
-    except (ValueError, IndexError):
-        return (0, 0, 0)  # Return black for invalid hex
+    except ValueError as e: # Catch specific error from int() or our own
+        # Re-raise a more informative error if it's from int()
+        if 'invalid literal for int()' in str(e):
+            raise ValueError(f"Invalid character in hex color string: '{h_orig}'") from e
+        raise ValueError(f"Invalid hex color string: '{h_orig}'. {e}") from e
+    except IndexError:
+        # This case should ideally be caught by length checks, but as a fallback:
+        raise ValueError(f"Hex color string '{h_orig}' too short after '#' removal.")
 
 def is_valid_hex(hex_color):
-    pattern = r'^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
-    return bool(re.match(pattern, hex_color))
+    if not isinstance(hex_color, str):
+        return False
+    pattern = r'^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$' # Keep existing pattern for basic check
+    if not re.match(pattern, hex_color):
+        return False
+    # Try full conversion to be absolutely sure
+    try:
+        hex_to_rgb(hex_color) # hex_to_rgb will raise ValueError if not truly valid
+        return True
+    except ValueError:
+        return False
 
 def rgb_to_hls(r, g, b):
     return colorsys.rgb_to_hls(r/255.0, g/255.0, b/255.0)
@@ -142,10 +162,13 @@ def ensure_wcag_compliant(fg_color, bg_color, min_ratio=4.5, preserve_character=
 
 # --- Scheme generation ---
 def generate_scheme(base_hex, scheme, n):
-    if not is_valid_hex(base_hex):
-        return ["#3498DB"] * n
-    
-    h, l, s = rgb_to_hls(*hex_to_rgb(base_hex))
+    try:
+        # hex_to_rgb will raise ValueError if base_hex is invalid
+        r_base, g_base, b_base = hex_to_rgb(base_hex)
+        h, l, s = rgb_to_hls(r_base, g_base, b_base)
+    except ValueError as e:
+        raise ValueError(f"Invalid base_hex '{base_hex}' in generate_scheme: {e}") from e
+
     colors = []
     if scheme == "Monochromatic":
         span = 0.5
@@ -597,14 +620,28 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
     
     def update_palette(self):
         base = self.color_picker.hex_input.text().strip()
-        if not is_valid_hex(base):
-            self.statusBar().showMessage("Invalid hex color! Using default color.")
+        try:
+            # Attempt to convert to ensure validity early, though generate_scheme will also do it.
+            # This is more about catching it before generate_scheme if base itself is bad.
+            hex_to_rgb(base)
+        except ValueError as e:
+            self.statusBar().showMessage(f"Error: {e}. Using default color #3498DB.")
             base = "#3498DB"
-            self.color_picker.set_color(base)
+            self.color_picker.set_color(base) # Update picker to reflect default
         
         scheme = self.scheme_combo.currentText()
         n = int(self.num_combo.currentText())
-        cols = generate_scheme(base, scheme, n)
+
+        try:
+            cols = generate_scheme(base, scheme, n)
+        except ValueError as e: # Catch error from generate_scheme
+            self.statusBar().showMessage(f"Palette generation error: {e}. Using default palette.")
+            # Ensure n is defined, it should be from self.num_combo.currentText()
+            # If n itself is problematic, that's a separate issue, assume n is valid here.
+            actual_n = int(self.num_combo.currentText()) # re-fetch or ensure n is correct
+            cols = ["#3498DB"] * actual_n
+            # Optionally reset base color if the error implies it's unusable
+            # self.color_picker.set_color("#3498DB")
         
         # Handle fixed-count schemes
         if scheme in ("Split-Complementary", "Triadic", "Tetradic"):
@@ -1341,7 +1378,7 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
         <p><b>Disclaimer:</b> I developed this as a solo project using AI-assisted "vibe coding". 
         Any issues in the code are part of my learning journey.</p>
         <p>Contact: soundchazer@gmail.com</p>
-        <p>© 2025 Soundchazer2k. All rights reserved.</p>
+        <p>© 2024 Soundchazer2k. All rights reserved.</p>
         """
         
         QtWidgets.QMessageBox.about(self, "About Enhanced Theme Studio", about_text)
@@ -1535,7 +1572,12 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
         
         # Apply a slight variation to base color to make the change visible
         # even if all settings are the same
-        r, g, b = hex_to_rgb(old_base)
+        try:
+            r, g, b = hex_to_rgb(old_base)
+        except ValueError:
+            # If old_base somehow became invalid, default to black or another failsafe
+            r, g, b = (0,0,0)
+            self.set_status(f"Warning: Could not parse previous base color {old_base}. Varied from black.")
         
         # Add small random variation (±5%)
         r = max(0, min(255, r + random.randint(-13, 13)))
@@ -1869,7 +1911,11 @@ class ColorWheelWidget(QtWidgets.QWidget):
             return
         
         # Draw base color at center
-        base_r, base_g, base_b = hex_to_rgb(self.base_color)
+        try:
+            base_r, base_g, base_b = hex_to_rgb(self.base_color)
+        except ValueError:
+            # Fallback to a default color for the wheel if base_color is invalid
+            base_r, base_g, base_b = (52, 152, 219) # Default blue
         base_h, base_l, base_s = rgb_to_hls(base_r, base_g, base_b)
         
         # Draw center circle
@@ -1920,15 +1966,16 @@ class ColorWheelWidget(QtWidgets.QWidget):
                 str(i+1)
             )
 
-if __name__ == '__main__':
+def run_studio():
+    import sys # Ensure sys is imported if not already in global scope of this function
+    from PyQt6 import QtWidgets # Ensure QtWidgets is imported
+    # If EnhancedThemeGenerator is defined in this file, it's fine.
+    # Otherwise, adjust imports.
+
     app = QtWidgets.QApplication(sys.argv)
     win = EnhancedThemeGenerator()
     win.show()
     sys.exit(app.exec())
 
-def main():
-    """Entry point for the application when installed as a package"""
-    app = QtWidgets.QApplication(sys.argv)
-    win = EnhancedThemeGenerator()
-    win.show()
-    sys.exit(app.exec()) 
+if __name__ == '__main__':
+    run_studio()
