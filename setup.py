@@ -34,10 +34,11 @@ setup(
     install_requires=[
         "PyQt6",
         "numpy",
+        "pillow",
     ],
     entry_points={
         "console_scripts": [
-            "theme-studio=enhanced_theme_generator:main",
+            "theme-studio=enhanced_theme_generator:run_studio",
         ],
     },
     package_data={

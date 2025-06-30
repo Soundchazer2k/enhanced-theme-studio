@@ -1,0 +1,25 @@
+feat: Implement image-based and trending palette features
+
+This commit introduces new functionalities to the Enhanced Theme Studio:
+
+- **Image-Based Palette Extraction**: Users can now extract color palettes directly from uploaded images, providing a new source of inspiration.
+- **Trending Palettes**: A curated list of trending color palettes has been added, allowing users to quickly load predefined color schemes.
+- **Custom Color Scheme**: A "Custom" scheme option is introduced to support directly loaded palettes without enforcing color theory rules.
+
+Refactor: Improve code and update dependencies
+
+- Refactored `create_dark_variant` and `create_light_variant` methods to reduce code duplication and improve maintainability.
+- Updated the minimum Python version requirement from 3.6 to 3.8 across all documentation and configuration files (`README.md`, `Enhanced_Theme_Studio_Manual.md`, `Enhanced_Theme_Studio_Quick_Start.md`, `pyproject.toml`, `setup.py`) to align with modern library support.
+- Pinned dependencies in `requirements.txt` using `pip-tools` for consistent installations.
+
+Fix: Resolve critical bugs
+
+- Addressed and resolved `RecursionError` caused by signal loops in the `update_palette` function.
+- Fixed `AttributeError` that occurred when loading custom palettes into an unpopulated table, ensuring robust initialization.
+
+Docs: Update documentation and changelog
+
+- Updated `CHANGELOG.md` with detailed information about all changes in version 1.1.0.
+- Revised `Enhanced_Theme_Studio_Manual.md` and `Enhanced_Theme_Studio_Quick_Start.md` to include instructions for new features and updated system requirements.
+
+Build: Increment version to 1.1.0

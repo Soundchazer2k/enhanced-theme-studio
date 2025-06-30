@@ -24,6 +24,7 @@ classifiers = [
 dependencies = [
     "PyQt6",
     "numpy",
+    "pillow",
 ]
 
 [project.urls]
@@ -31,7 +32,7 @@ dependencies = [
 "Bug Tracker" = "https://github.com/Soundchazer2k/enhanced-theme-studio/issues"
 
 [project.scripts]
-theme-studio = "enhanced_theme_generator:main"
+theme-studio = "enhanced_theme_generator:run_studio"
 
 [tool.setuptools]
 py-modules = ["enhanced_theme_generator"]

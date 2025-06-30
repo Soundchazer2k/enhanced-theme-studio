@@ -27,6 +27,8 @@ Download the latest release from the [Releases](https://github.com/Soundchazer2k
 
 ### From Source
 
+### From Source
+
 Requires Python 3.8 or higher.
 
 1. Clone this repository:
@@ -118,6 +120,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
   - AI-assisted development with LLM code generation
   - "Vibe coding" methodology which prioritizes user experience and accessibility
 
-# Copyright (C) 2025 Soundchazer2k 
+# Copyright (C) 2024 Soundchazer2k
 
-© 2025 Soundchazer2k. All rights reserved. 
+© 2024 Soundchazer2k. All rights reserved.
