@@ -7,6 +7,8 @@ A powerful color theme generator with accessibility features, built with PyQt6.
 ## Features
 
 - Generate color palettes based on color theory (Monochromatic, Analogous, Complementary, etc.)
+- **New:** Extract color palettes from images
+- **New:** Load palettes from a curated list of trending color schemes
 - WCAG compliance checking for accessibility
 - Colorblindness simulation preview
 - Dark/Light mode toggle with auto-adjustment
@@ -120,6 +122,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
   - AI-assisted development with LLM code generation
   - "Vibe coding" methodology which prioritizes user experience and accessibility
 
-# Copyright (C) 2024 Soundchazer2k
+# Copyright (C) 2025 Soundchazer2k
 
-© 2024 Soundchazer2k. All rights reserved.
+© 2025 Soundchazer2k. All rights reserved.

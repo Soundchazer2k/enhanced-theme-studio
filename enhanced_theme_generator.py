@@ -28,61 +28,23 @@ from PIL import Image
 
 
 # Version information
-<<<<<<< HEAD
 __version__ = "1.1.0"
 __version_info__ = (1, 1, 0)
 __release_date__ = "2025-06-29"
-
-=======
-__version__ = "1.0.0"
-__version_info__ = (1, 0, 0)  # For programmatic access
-__release_date__ = "2024-04-28"
->>>>>>> b3ef4fc003f192e67236cdc5d495c5987127a01f
 
 # --- Utilities for color math & contrast ---
 def hex_to_rgb(h):
     h_orig = h
     try:
-<<<<<<< HEAD
         h = h.lstrip("#")
         return tuple(int(h[i : i + 2], 16) for i in (0, 2, 4))
     except (ValueError, IndexError):
         return (0, 0, 0)  # Return black for invalid hex
-=======
-        h = h.lstrip('#')
-        if len(h) == 3: # Handle shorthand hex like #RGB
-            h = "".join([c*2 for c in h])
-        if len(h) != 6:
-            raise ValueError(f"Invalid hex color string: '{h_orig}' must be 3 or 6 hex characters long after '#' removal.")
-        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
-    except ValueError as e: # Catch specific error from int() or our own
-        # Re-raise a more informative error if it's from int()
-        if 'invalid literal for int()' in str(e):
-            raise ValueError(f"Invalid character in hex color string: '{h_orig}'") from e
-        raise ValueError(f"Invalid hex color string: '{h_orig}'. {e}") from e
-    except IndexError:
-        # This case should ideally be caught by length checks, but as a fallback:
-        raise ValueError(f"Hex color string '{h_orig}' too short after '#' removal.")
->>>>>>> b3ef4fc003f192e67236cdc5d495c5987127a01f
 
 
 def is_valid_hex(hex_color):
-<<<<<<< HEAD
     pattern = r"^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
     return bool(re.match(pattern, hex_color))
-=======
-    if not isinstance(hex_color, str):
-        return False
-    pattern = r'^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$' # Keep existing pattern for basic check
-    if not re.match(pattern, hex_color):
-        return False
-    # Try full conversion to be absolutely sure
-    try:
-        hex_to_rgb(hex_color) # hex_to_rgb will raise ValueError if not truly valid
-        return True
-    except ValueError:
-        return False
->>>>>>> b3ef4fc003f192e67236cdc5d495c5987127a01f
 
 
 def rgb_to_hls(r, g, b):
@@ -180,20 +142,10 @@ def ensure_wcag_compliant(fg_color, bg_color, min_ratio=4.5, preserve_character=
 
 # --- Scheme generation ---
 def generate_scheme(base_hex, scheme, n):
-<<<<<<< HEAD
     if not is_valid_hex(base_hex):
         return ["#3498DB"] * n
 
     h, l, s = rgb_to_hls(*hex_to_rgb(base_hex))
-=======
-    try:
-        # hex_to_rgb will raise ValueError if base_hex is invalid
-        r_base, g_base, b_base = hex_to_rgb(base_hex)
-        h, l, s = rgb_to_hls(r_base, g_base, b_base)
-    except ValueError as e:
-        raise ValueError(f"Invalid base_hex '{base_hex}' in generate_scheme: {e}") from e
-
->>>>>>> b3ef4fc003f192e67236cdc5d495c5987127a01f
     colors = []
     if scheme == "Monochromatic":
         span = 0.5
@@ -326,6 +278,9 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
         self.random_color_btn.setFixedSize(30, 30)
         self.random_color_btn.clicked.connect(self.generate_random_color)
 
+        base_color_layout.addWidget(self.color_picker)
+        base_color_layout.addWidget(self.random_color_btn)
+
         # Image-based palette generation
         image_group = QtWidgets.QGroupBox("Image-Based Palette")
         image_layout = QtWidgets.QVBoxLayout(image_group)
@@ -335,7 +290,6 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
         self.pick_from_image_btn.clicked.connect(self.pick_from_image)
 
         image_layout.addWidget(self.pick_from_image_btn)
-        ctrl_layout.addWidget(image_group)
 
         # Scheme selection with icon indicators
         self.scheme_combo = QtWidgets.QComboBox()
@@ -364,6 +318,7 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
 
         # Add to control layout
         ctrl_layout.addLayout(color_layout)
+        ctrl_layout.addWidget(image_group)
 
         # Add separator
         separator = QtWidgets.QFrame()
@@ -736,103 +691,107 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
     def on_count_changed(self, count):
         self.update_palette()
 
-    def update_palette(self):
-        base = self.color_picker.hex_input.text().strip()
-        try:
-            # Attempt to convert to ensure validity early, though generate_scheme will also do it.
-            # This is more about catching it before generate_scheme if base itself is bad.
-            hex_to_rgb(base)
-        except ValueError as e:
-            self.statusBar().showMessage(f"Error: {e}. Using default color #3498DB.")
-            base = "#3498DB"
-<<<<<<< HEAD
-            self.color_picker.set_color(base)
+    def update_palette(self, custom_colors=None):
+        cols = []  # Initialize cols to an empty list
 
-        scheme = self.scheme_combo.currentText()
-        n = int(self.num_combo.currentText())
-        cols = generate_scheme(base, scheme, n)
-
-=======
-            self.color_picker.set_color(base) # Update picker to reflect default
-        
-        scheme = self.scheme_combo.currentText()
-        n = int(self.num_combo.currentText())
-
-        try:
-            cols = generate_scheme(base, scheme, n)
-        except ValueError as e: # Catch error from generate_scheme
-            self.statusBar().showMessage(f"Palette generation error: {e}. Using default palette.")
-            # Ensure n is defined, it should be from self.num_combo.currentText()
-            # If n itself is problematic, that's a separate issue, assume n is valid here.
-            actual_n = int(self.num_combo.currentText()) # re-fetch or ensure n is correct
-            cols = ["#3498DB"] * actual_n
-            # Optionally reset base color if the error implies it's unusable
-            # self.color_picker.set_color("#3498DB")
-        
->>>>>>> b3ef4fc003f192e67236cdc5d495c5987127a01f
-        # Handle fixed-count schemes
-        if scheme in ("Split-Complementary", "Triadic", "Tetradic"):
-            n = len(cols)
+        if custom_colors is not None:
+            # Scenario 1: A specific palette is provided (e.g., from trending)
+            cols = custom_colors
+            # Update UI controls to reflect this custom palette
             self.num_combo.blockSignals(True)
-            self.num_combo.setCurrentText(str(n))
+            self.num_combo.setCurrentText(str(len(cols)))
             self.num_combo.blockSignals(False)
+            self.scheme_combo.blockSignals(True)
+            self.scheme_combo.setCurrentText("Custom")
+            self.scheme_combo.blockSignals(False)
+        else:
+            # Scenario 2: Generate palette based on current UI settings
+            base = self.color_picker.hex_input.text().strip()
+            if not is_valid_hex(base):
+                self.statusBar().showMessage("Invalid hex color! Using default color.")
+                base = "#3498DB"
+                self.color_picker.set_color(base)
 
-        # Update palette table
-        self.table.setColumnCount(n)
-        self.table.setHorizontalHeaderLabels([f"Color {i + 1}" for i in range(n)])
+            scheme = self.scheme_combo.currentText()
+            n = int(self.num_combo.currentText())
+
+            if scheme == "Custom":
+                # If 'Custom' is selected manually, try to read from the table.
+                # If table is empty (e.g., at startup), provide a default.
+                current_table_colors = []
+                if self.table.columnCount() > 0 and self.table.item(0, 0) is not None:
+                    for i in range(self.table.columnCount()):
+                        item = self.table.item(0, i)
+                        if item:
+                            current_table_colors.append(item.text())
+                
+                if current_table_colors:
+                    cols = current_table_colors
+                else:
+                    # Default custom palette if no colors are in the table or table is empty
+                    cols = ["#3498DB", "#DB9834", "#808080", "#555555", "#AAAAAA"] # More colors for a default
+            else:
+                # Generate scheme based on selected type
+                cols = generate_scheme(base, scheme, n)
+                # Handle fixed-count schemes (already present)
+                if scheme in ("Split-Complementary", "Triadic", "Tetradic"):
+                    n = len(cols)
+                    self.num_combo.blockSignals(True)
+                    self.num_combo.setCurrentText(str(n))
+                    self.num_combo.blockSignals(False)
+
+        # Now, 'cols' contains the definitive palette to be displayed and processed.
+        # The rest of the update_palette function can proceed with 'cols'.
+
+        # Update palette table (common logic)
+        self.table.setColumnCount(len(cols))
+        self.table.setHorizontalHeaderLabels([f"Color {i + 1}" for i in range(len(cols))])
         self.table.setVerticalHeaderLabels(
             ["Original", "Contrast", "WCAG Level", "Adjusted for Accessibility"]
         )
 
-        # Add a flicker effect to show regeneration (temporarily hide and show)
-        self.table.hide()
+        self.table.hide() # Flicker effect
 
-        # Get minimum contrast ratio based on selected level
         min_ratio = 7.0 if "AAA" in self.wcag_level.currentText() else 4.5
         preserve_character = self.preserve_character_check.isChecked()
         adjusted_cols = []
 
         for i, hexcol in enumerate(cols):
-            # Original color swatch
+            # ... (existing logic for populating table rows) ...
             swatch = QtWidgets.QTableWidgetItem(hexcol)
             swatch.setBackground(QtGui.QColor(hexcol))
             fg = pick_foreground(hexcol)
             swatch.setForeground(QtGui.QColor(fg))
             swatch.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            # Contrast ratio
             ratio = contrast_ratio(hexcol, fg)
             ratio_item = QtWidgets.QTableWidgetItem(f"{ratio:.1f}:1")
             ratio_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            # WCAG level
             wcag = get_wcag_level(ratio)
             wcag_item = QtWidgets.QTableWidgetItem(wcag)
             wcag_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            # Add background color to indicate WCAG level with improved contrast
             if wcag == "AAA":
-                wcag_bg = QtGui.QColor(50, 150, 50)  # Darker green
-                wcag_fg = QtGui.QColor(255, 255, 255)  # White text
+                wcag_bg = QtGui.QColor(50, 150, 50)
+                wcag_fg = QtGui.QColor(255, 255, 255)
             elif wcag == "AA":
-                wcag_bg = QtGui.QColor(100, 150, 50)  # Green-yellow
-                wcag_fg = QtGui.QColor(0, 0, 0)  # Black text
+                wcag_bg = QtGui.QColor(100, 150, 50)
+                wcag_fg = QtGui.QColor(0, 0, 0)
             elif wcag == "AA Large":
-                wcag_bg = QtGui.QColor(180, 150, 10)  # Dark yellow
-                wcag_fg = QtGui.QColor(0, 0, 0)  # Black text
+                wcag_bg = QtGui.QColor(180, 150, 10)
+                wcag_fg = QtGui.QColor(0, 0, 0)
             else:
-                wcag_bg = QtGui.QColor(180, 50, 50)  # Dark red
-                wcag_fg = QtGui.QColor(255, 255, 255)  # White text
+                wcag_bg = QtGui.QColor(180, 50, 50)
+                wcag_fg = QtGui.QColor(255, 255, 255)
 
             wcag_item.setBackground(wcag_bg)
             wcag_item.setForeground(wcag_fg)
 
-            # Make WCAG text bold for better readability
             font = wcag_item.font()
             font.setBold(True)
             wcag_item.setFont(font)
 
-            # Create adjusted color if needed
             if (
                 self.wcag_check.isChecked()
                 and wcag not in ["AAA"]
@@ -850,20 +809,16 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
 
             adjusted_cols.append(adjusted_col)
 
-            # Adjusted color swatch
             adjusted_swatch = QtWidgets.QTableWidgetItem(adjusted_col)
             adjusted_swatch.setBackground(QtGui.QColor(adjusted_col))
             adjusted_swatch.setForeground(QtGui.QColor(fg))
             adjusted_swatch.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            # Indicate if color was adjusted
             if adjusted_col != hexcol:
                 adjusted_swatch.setToolTip(
                     f"Adjusted from {hexcol} for {adjusted_wcag} compliance"
                 )
-                # Add a small indicator that this was adjusted
                 adjusted_swatch.setText("✓")
-                # Make the font bold for adjusted colors
                 font = adjusted_swatch.font()
                 font.setBold(True)
                 adjusted_swatch.setFont(font)
@@ -873,31 +828,23 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
             self.table.setItem(2, i, wcag_item)
             self.table.setItem(3, i, adjusted_swatch)
 
-        # Store the original light theme palette
-        self.light_palette = cols
+        self.light_palette = cols # Store the original light theme palette
 
-        # Show the table again
         self.table.show()
         self.table.resizeColumnsToContents()
 
-        # First determine which palette to use based on theme mode
         current_mode = self.theme_toggle.currentText()
 
         if current_mode == "Dark Mode" and self.auto_adjust_dark.isChecked():
-            # Create dark variant from the light palette
             self.create_dark_variant()
-            # Use the dark palette for preview
             palette_for_preview = self.dark_palette
         else:
-            # Use the new light palette
             self.current_palette = cols
-            # Use adjusted colors for preview if WCAG is enabled
             if self.wcag_check.isChecked():
                 palette_for_preview = adjusted_cols
             else:
                 palette_for_preview = cols
 
-        # Update widget preview with appropriate palette
         if palette_for_preview:
             self.update_preview_components(palette_for_preview)
 
@@ -1571,7 +1518,7 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
         <p><b>Disclaimer:</b> I developed this as a solo project using AI-assisted "vibe coding". 
         Any issues in the code are part of my learning journey.</p>
         <p>Contact: soundchazer@gmail.com</p>
-        <p>© 2024 Soundchazer2k. All rights reserved.</p>
+        <p>© 2025 Soundchazer2k. All rights reserved.</p>
         """
 
         QtWidgets.QMessageBox.about(self, "About Enhanced Theme Studio", about_text)
@@ -1624,163 +1571,6 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
         self.scheme_combo.blockSignals(False)
         self.update_palette(custom_colors=palette["colors"])
         dialog.accept()
-
-    def update_palette(self, custom_colors=None):
-        cols = []  # Initialize cols to an empty list
-
-        if custom_colors is not None:
-            # Scenario 1: A specific palette is provided (e.g., from trending)
-            cols = custom_colors
-            # Update UI controls to reflect this custom palette
-            self.num_combo.blockSignals(True)
-            self.num_combo.setCurrentText(str(len(cols)))
-            self.num_combo.blockSignals(False)
-            self.scheme_combo.blockSignals(True)
-            self.scheme_combo.setCurrentText("Custom")
-            self.scheme_combo.blockSignals(False)
-        else:
-            # Scenario 2: Generate palette based on current UI settings
-            base = self.color_picker.hex_input.text().strip()
-            if not is_valid_hex(base):
-                self.statusBar().showMessage("Invalid hex color! Using default color.")
-                base = "#3498DB"
-                # The initial color is set in __init__, and subsequent changes are via on_color_changed.
-
-            scheme = self.scheme_combo.currentText()
-            n = int(self.num_combo.currentText())
-
-            if scheme == "Custom":
-                # If 'Custom' is selected manually, try to read from the table.
-                # If table is empty (e.g., at startup), provide a default.
-                current_table_colors = []
-                if self.table.columnCount() > 0 and self.table.item(0, 0) is not None:
-                    for i in range(self.table.columnCount()):
-                        item = self.table.item(0, i)
-                        if item:
-                            current_table_colors.append(item.text())
-                
-                if current_table_colors:
-                    cols = current_table_colors
-                else:
-                    # Default custom palette if no colors are in the table or table is empty
-                    cols = ["#3498DB", "#DB9834", "#808080", "#555555", "#AAAAAA"] # More colors for a default
-            else:
-                # Generate scheme based on selected type
-                cols = generate_scheme(base, scheme, n)
-                # Handle fixed-count schemes (already present)
-                if scheme in ("Split-Complementary", "Triadic", "Tetradic"):
-                    n = len(cols)
-                    self.num_combo.blockSignals(True)
-                    self.num_combo.setCurrentText(str(n))
-                    self.num_combo.blockSignals(False)
-
-        # Now, 'cols' contains the definitive palette to be displayed and processed.
-        # The rest of the update_palette function can proceed with 'cols'.
-
-        # Update palette table (common logic)
-        self.table.setColumnCount(len(cols))
-        self.table.setHorizontalHeaderLabels([f"Color {i + 1}" for i in range(len(cols))])
-        self.table.setVerticalHeaderLabels(
-            ["Original", "Contrast", "WCAG Level", "Adjusted for Accessibility"]
-        )
-
-        self.table.hide() # Flicker effect
-
-        min_ratio = 7.0 if "AAA" in self.wcag_level.currentText() else 4.5
-        preserve_character = self.preserve_character_check.isChecked()
-        adjusted_cols = []
-
-        for i, hexcol in enumerate(cols):
-            # ... (existing logic for populating table rows) ...
-            swatch = QtWidgets.QTableWidgetItem(hexcol)
-            swatch.setBackground(QtGui.QColor(hexcol))
-            fg = pick_foreground(hexcol)
-            swatch.setForeground(QtGui.QColor(fg))
-            swatch.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-
-            ratio = contrast_ratio(hexcol, fg)
-            ratio_item = QtWidgets.QTableWidgetItem(f"{ratio:.1f}:1")
-            ratio_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-
-            wcag = get_wcag_level(ratio)
-            wcag_item = QtWidgets.QTableWidgetItem(wcag)
-            wcag_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-
-            if wcag == "AAA":
-                wcag_bg = QtGui.QColor(50, 150, 50)
-                wcag_fg = QtGui.QColor(255, 255, 255)
-            elif wcag == "AA":
-                wcag_bg = QtGui.QColor(100, 150, 50)
-                wcag_fg = QtGui.QColor(0, 0, 0)
-            elif wcag == "AA Large":
-                wcag_bg = QtGui.QColor(180, 150, 10)
-                wcag_fg = QtGui.QColor(0, 0, 0)
-            else:
-                wcag_bg = QtGui.QColor(180, 50, 50)
-                wcag_fg = QtGui.QColor(255, 255, 255)
-
-            wcag_item.setBackground(wcag_bg)
-            wcag_item.setForeground(wcag_fg)
-
-            font = wcag_item.font()
-            font.setBold(True)
-            wcag_item.setFont(font)
-
-            if (
-                self.wcag_check.isChecked()
-                and wcag not in ["AAA"]
-                and ratio < min_ratio
-            ):
-                adjusted_col = ensure_wcag_compliant(
-                    fg, hexcol, min_ratio, preserve_character
-                )
-                adjusted_ratio = contrast_ratio(adjusted_col, fg)
-                adjusted_wcag = get_wcag_level(adjusted_ratio)
-            else:
-                adjusted_col = hexcol
-                adjusted_wcag = wcag
-                adjusted_ratio = ratio
-
-            adjusted_cols.append(adjusted_col)
-
-            adjusted_swatch = QtWidgets.QTableWidgetItem(adjusted_col)
-            adjusted_swatch.setBackground(QtGui.QColor(adjusted_col))
-            adjusted_swatch.setForeground(QtGui.QColor(fg))
-            adjusted_swatch.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-
-            if adjusted_col != hexcol:
-                adjusted_swatch.setToolTip(
-                    f"Adjusted from {hexcol} for {adjusted_wcag} compliance"
-                )
-                adjusted_swatch.setText("✓")
-                font = adjusted_swatch.font()
-                font.setBold(True)
-                adjusted_swatch.setFont(font)
-
-            self.table.setItem(0, i, swatch)
-            self.table.setItem(1, i, ratio_item)
-            self.table.setItem(2, i, wcag_item)
-            self.table.setItem(3, i, adjusted_swatch)
-
-        self.light_palette = cols # Store the original light theme palette
-
-        self.table.show()
-        self.table.resizeColumnsToContents()
-
-        current_mode = self.theme_toggle.currentText()
-
-        if current_mode == "Dark Mode" and self.auto_adjust_dark.isChecked():
-            self.create_dark_variant()
-            palette_for_preview = self.dark_palette
-        else:
-            self.current_palette = cols
-            if self.wcag_check.isChecked():
-                palette_for_preview = adjusted_cols
-            else:
-                palette_for_preview = cols
-
-        if palette_for_preview:
-            self.update_preview_components(palette_for_preview)
 
     def save_palette(self):
         """Save the current palette to the favorites"""
@@ -2069,27 +1859,7 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
         if not hasattr(self, "light_palette") or not self.light_palette:
             return
 
-        dark_palette = []
-        for i, color in enumerate(self.light_palette):
-            r, g, b = hex_to_rgb(color)
-            h, l, s = rgb_to_hls(r, g, b)
-
-            if i == 0:
-                new_l = 0.7 if l < 0.5 else 0.3
-            elif i == 1:
-                new_l = 0.6 if l < 0.5 else 0.4
-            elif i == 2:
-                new_l = 0.8 if l < 0.5 else 0.75
-            elif i == 3:
-                new_l = 0.1
-                s = min(s, 0.3)
-            else:
-                new_l = 1.0 - l
-
-            dark_color = hls_to_hex(h, new_l, s)
-            dark_palette.append(dark_color)
-
-        self.dark_palette = dark_palette
+        self.dark_palette = self._create_variant(self.light_palette, "dark")
         self._update_theme_variant(self.dark_palette)
 
     def create_light_variant(self):
@@ -2099,6 +1869,32 @@ class EnhancedThemeGenerator(QtWidgets.QMainWindow):
             return
 
         self._update_theme_variant(self.light_palette)
+
+    def _create_variant(self, palette, mode):
+        """Helper to create a light or dark variant of a palette."""
+        variant_palette = []
+        for i, color in enumerate(palette):
+            r, g, b = hex_to_rgb(color)
+            h, l, s = rgb_to_hls(r, g, b)
+
+            if mode == "dark":
+                if i == 0:
+                    new_l = 0.7 if l < 0.5 else 0.3
+                elif i == 1:
+                    new_l = 0.6 if l < 0.5 else 0.4
+                elif i == 2:
+                    new_l = 0.8 if l < 0.5 else 0.75
+                elif i == 3:
+                    new_l = 0.1
+                    s = min(s, 0.3)
+                else:
+                    new_l = 1.0 - l
+            else: # mode == "light"
+                new_l = l
+
+            variant_color = hls_to_hex(h, new_l, s)
+            variant_palette.append(variant_color)
+        return variant_palette
 
     def update_table_with_palette(self, palette):
         """Update the palette table with the given colors"""
@@ -2199,7 +1995,6 @@ def simulate_colorblindness(hex_color, simulation_type):
     # Convert back to hex
     r_new, g_new, b_new = [int(c * 255) for c in transformed]
     return f"#{r_new:02X}{g_new:02X}{b_new:02X}"
-
 
 def simulate_palette(palette, simulation_type):
     """Apply colorblindness simulation to entire palette"""
@@ -2334,31 +2129,12 @@ class ColorWheelWidget(QtWidgets.QWidget):
                 str(i + 1),
             )
 
-<<<<<<< HEAD
+def run_studio():
+    """Entry point for the application."""
+    app = QtWidgets.QApplication(sys.argv)
+    win = EnhancedThemeGenerator()
+    win.show()
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
-=======
-def run_studio():
-    import sys # Ensure sys is imported if not already in global scope of this function
-    from PyQt6 import QtWidgets # Ensure QtWidgets is imported
-    # If EnhancedThemeGenerator is defined in this file, it's fine.
-    # Otherwise, adjust imports.
-
->>>>>>> b3ef4fc003f192e67236cdc5d495c5987127a01f
-    app = QtWidgets.QApplication(sys.argv)
-    win = EnhancedThemeGenerator()
-    win.show()
-    sys.exit(app.exec())
-
-<<<<<<< HEAD
-
-def main():
-    """Entry point for the application when installed as a package"""
-    app = QtWidgets.QApplication(sys.argv)
-    win = EnhancedThemeGenerator()
-    win.show()
-    sys.exit(app.exec())
-=======
-if __name__ == '__main__':
     run_studio()
->>>>>>> b3ef4fc003f192e67236cdc5d495c5987127a01f
