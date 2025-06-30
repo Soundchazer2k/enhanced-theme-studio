@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+from setuptools import setup
 
 # Read version from source
-with open('enhanced_theme_generator.py', 'r') as f:
+with open("enhanced_theme_generator.py", "r") as f:
     for line in f:
-        if line.startswith('__version__'):
-            version = line.split('=')[1].strip().strip('"\'')
+        if line.startswith("__version__"):
+            version = line.split("=")[1].strip().strip("\"'")
             break
 
-with open('README.md', 'r', encoding='utf-8') as f:
+with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
@@ -30,7 +30,7 @@ setup(
         "Topic :: Artistic Software",
         "Topic :: Multimedia :: Graphics",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     install_requires=[
         "PyQt6",
         "numpy",
@@ -41,6 +41,6 @@ setup(
         ],
     },
     package_data={
-        '': ['LICENSE', '*.md'],
+        "": ["LICENSE", "*.md"],
     },
-) 
+)

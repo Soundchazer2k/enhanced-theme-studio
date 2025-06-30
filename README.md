@@ -27,6 +27,8 @@ Download the latest release from the [Releases](https://github.com/Soundchazer2k
 
 ### From Source
 
+Requires Python 3.8 or higher.
+
 1. Clone this repository:
    ```
    git clone https://github.com/Soundchazer2k/enhanced-theme-studio.git

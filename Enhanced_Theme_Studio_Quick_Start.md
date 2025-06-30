@@ -4,6 +4,8 @@ This quick start guide will help you create your first color palette and export 
 
 ## 1. Launch the Application
 
+Ensure you have Python 3.8 or higher installed.
+
 Run the application by executing:
 ```
 python enhanced_theme_generator.py
@@ -16,16 +18,25 @@ python enhanced_theme_generator.py
    - Select a color or enter a hex code (e.g., #3498DB)
    - Or click the refresh icon for a random color
 
-2. **Select a Color Scheme**:
-   - Choose from: Monochromatic, Analogous, Complementary, Split-Complementary, Triadic, or Tetradic
-   - Each scheme creates different color relationships
+2. **Pick from an Image**:
+   - Click the "Create Palette from Image" button.
+   - Select an image file (PNG, JPG, JPEG, BMP).
+   - In the "Extracted Colors" dialog, click a color swatch to set it as the base color.
 
-3. **Set Number of Colors**:
-   - Select how many colors you want in your palette (2-12)
+3. **Load a Trending Palette**:
+   - Click the "Trending Palettes" button.
+   - In the dialog, click "Load" next to a pre-defined palette to use it.
 
-4. **Generate the Palette**:
-   - The palette is automatically generated and displayed in the table
-   - You can click "Generate New Palette" for variations
+4. **Select a Color Scheme**:
+   - Choose from: Monochromatic, Analogous, Complementary, Split-Complementary, Triadic, Tetradic, or **Custom**.
+   - "Custom" is automatically selected when loading a trending palette or picking from an image.
+
+5. **Set Number of Colors**:
+   - Select how many colors you want in your palette (2-12).
+
+6. **Generate the Palette**:
+   - The palette is automatically generated and displayed in the table.
+   - You can click "Generate New Palette" for variations.
 
 ## 3. Adjust for Accessibility
 

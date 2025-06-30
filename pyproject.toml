@@ -10,7 +10,7 @@ authors = [
 ]
 description = "A powerful color palette and theme generator built with PyQt6"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 license = {text = "GNU General Public License v3"}
 classifiers = [
     "Programming Language :: Python :: 3",
